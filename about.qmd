@@ -6,7 +6,7 @@ about:
   links:
     - icon: linkedin
       text: LinkedIn
-      href: https://linkedin.com
+      href: https://www.linkedin.com/in/shannon-kimmel-2262b560?trk=people-guest_people_search-card
     - icon: github
       text: Github
       href: https://github.com/skdunnigan
