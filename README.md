@@ -1,3 +1,3 @@
 ![anothercup](anothercup-image.png)
 
-A personal blog for coding adventures.
+Source code for a personal blog of coding adventures.
