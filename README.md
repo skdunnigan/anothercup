@@ -1,1 +1,3 @@
-# another-cup-of-tea
+# Another Cup
+
+![anothercup](anothercup-image.png)
