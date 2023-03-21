@@ -15,9 +15,9 @@ long_slug <- "2023-03-21_welcome"
 
 <!--------------- my post ----------------->
 
-This is my first post in a Quarto blog! That being said, this is also my first attempt *at* a Quarto blog. Welcome! 
+![](another-image.png)
 
-![](thumbnail.jpg)
+This is my first post in a Quarto blog! That being said, this is also my first attempt *at* a Quarto blog. Welcome! 
 
 I have written blogs before though nothing like this and especially not one with an emphasis on coding. It is very difficult to get a lot of my friends and family interested in the work that I do with R. Therefore, this blog is for me. It's for me to be able to "talk out" what I find and how I'm learning. It's a way to discover new things or attempt data science challenges - I've always wanted to participate in some of the [TidyTuesday](https://github.com/rfordatascience/tidytuesday) challenges! 
 

@@ -1,0 +1,65 @@
+[
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "Shannon Dunnigan Kimmel",
+    "section": "",
+    "text": "Hi there! I work in the National Estuarine Research Reserve System as the System-Wide Monitoring (SWMP) Program Manager at the Guana Tolomato Matanzas NERR in St. Augustine, FL. This program collects 15-minute continuous water quality and weather data and therefore, I quickly jumped into R programming in order to be able to tackle working with this data (reaching the end of an Excel spreadsheet was a moment for me)."
+  },
+  {
+    "objectID": "about.html#education",
+    "href": "about.html#education",
+    "title": "Shannon Dunnigan Kimmel",
+    "section": "Education",
+    "text": "Education\n\nMS (2015): Biology with Coastal Biology Focus (UNF)\nBS (2012): Biological Science with certificate in Living Marine Resources (FSU)"
+  },
+  {
+    "objectID": "about.html#experience",
+    "href": "about.html#experience",
+    "title": "Shannon Dunnigan Kimmel",
+    "section": "Experience",
+    "text": "Experience\n\n2016 - present: System-Wide Monitoring Program (SWMP) Manager (Guana Tolomato Matanzas NERR), contracted through University of North Florida.\n2020 - 2022: Data Manager for NERRS Science Collaborative Catalyst project “Refining techniques for high-frequency monitoring of chlorophyll in the NERRS”. The project code is here chla-nerrs-catalyst and includes my first attempt at a GitHub Pages site! (💃Personal achievement!)\n2013 - 2021: Adjunct Instructor (University of North Florida)\n2015 - 2016: Oyster Condition Assessment Field Technician (Florida Department of Environmental Protection)"
+  },
+  {
+    "objectID": "about.html#teaching",
+    "href": "about.html#teaching",
+    "title": "Shannon Dunnigan Kimmel",
+    "section": "Teaching",
+    "text": "Teaching\n\n2022\n\nData Visualization: a workshop I created and led on 2022 January 27-28 as part of a series of R workshops sponsored by the Gulf and Florida National Estuarine Research Reserves (NERRs). Materials at 2022-01_data-viz-workshop\n\n2021\n\nR For the Infrequent UseR (virtual): a workshop I taught on 2021 September 23-24 as part of a series of R workshops sponsored by the Gulf and Florida National Estuarine Research Reserves (NERRs). Materials at 2021-infrequent-useR\n\n2020\n\nIntegrating R into your work with RStudio and the tidyverse (virtual): a workshop I co-taught with Kim Cressman that was split into four days and covered data visualization, wrangling, and basic statistical outputs on\n\n2020 June 18-19 and 25-26 (virtual), hosted by the Guana Tolomato Matanzas NERR. Materials at 2020-06_IntegrateR\n2020 February 19-20 (in-person in Moss Point, MS) hosted by the Grand Bay NERR. Materials at: swmpkim/2020-02_GBNERR_Rworkshop\n\n\n2019\n\nThe Next Step with R: Data Management, Graphics, and Functions: Coastal and Estuarine Research Federation (CERF) 2019 Biennial Conference workshop, 2019 November 3 in Mobile, AL co-taught with Kim Cressman"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Another Cup",
+    "section": "",
+    "text": "Order By\n       Default\n         \n          Title\n        \n         \n          Date - Oldest\n        \n         \n          Date - Newest\n        \n     \n  \n    \n      \n      \n    \n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nswmp\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\n\n\n2023-03-21\n\n\n4 min\n\n\n\n\n\n\n  \n\n\n\n\n\n\n\n\n\n\nnews\n\n\n\n\nThis blog is a way to capture the different things I am learning or working on with R code.\n\n\n\n\n\n\n2023-03-16\n\n\n1 min\n\n\n\n\n\n\nNo matching items"
+  },
+  {
+    "objectID": "posts/welcome/index.html",
+    "href": "posts/welcome/index.html",
+    "title": "Welcome To My Blog",
+    "section": "",
+    "text": "This is my first post in a Quarto blog! That being said, this is also my first attempt at a Quarto blog. Welcome!\nI have written blogs before though nothing like this and especially not one with an emphasis on coding. It is very difficult to get a lot of my friends and family interested in the work that I do with R. Therefore, this blog is for me. It’s for me to be able to “talk out” what I find and how I’m learning. It’s a way to discover new things or attempt data science challenges - I’ve always wanted to participate in some of the TidyTuesday challenges!\nHave you ever figured out a solution to a problem that then presented itself again several weeks/months/years down the line and you forgot what your original fix was?1\nYeah…I’ve been there a lot. That being said, I am also hoping this blog will be a great place to store all of these workflows for me (or anyone) to reference again in the future.\n\nWhy “Another Cup”?\nWhy did I call this blog “Another Cup”? Well, because some problems simply require another cup of a hot (or cold!) beverage to solve!2\nSo, here is to tackling new things with another cup of [whatever] in hand!\n\n\n\n\n\nFootnotes\n\n\nOkay, if you answered “no” then you must be some sort of magician.↩︎\nI’m partial to coffee, myself. Today was a cup of Starbucks Instant Coffee (don’t judge!)↩︎"
+  },
+  {
+    "objectID": "posts/what-about-wind/index.html",
+    "href": "posts/what-about-wind/index.html",
+    "title": "What to do with wind?",
+    "section": "",
+    "text": "I work with water quality and meteorological data regularly with my work. As such, I am often trying to find creative ways to summarize and visualize this data to share with resource managers, educators, and colleagues. One of the recent challenges has been on how to present wind speed and direction data in an easy-to-digest format to other people.\nThis came about in my work summarizing the effects of recent hurricanes Ian (October 2022) and Nicole (November 2022) in northeast Florida. The typical way folks in my office have depicted wind data has been through the use of wind roses. Don’t get me wrong, wind roses have their usefulness! However, when it came to the matter of these hurricanes, I was also interested in a time element to the data that is just not captured well in a wind rose.\nHere’s an example of a wind rose from the openair package.\nFor this, I wanted to to see if there was a way to visualize the predominating wind directions and speeds in the days preceding, during, and following the hurricanes. So, I went down a Google rabbit hole attempting to examples of how others have attempted something like this in the past. I wanted something that:\nI ended up stumbling upon a great thread on Stack Overflow that used a raster grid-style plot where every cell had a latitude and longitude component as well as the wind speed and direction. Since I was visualizing wind data generated from a single, fixed station\nHere is the data we are working with: aggregated 15-minute wind speed (m/s) and direction data averaged to the hour.\nUsing the dplyr::mutate() function, I then pulled out the day and hour information from the datetimestamp variable and also converted wind speed into miles per hour (this is what is reported in the news).\nI used that thread on Stack Overflow to create a similar plot with a color scheme I preferred. Instead of latitude and longitude, I plotted by hour and day. I also used scale_x_continuous to break the x-axis so it is easier to read the hours in the day.\nI noticed something weird with the direction data, however, and after some reading into the code I realized that the geom_spoke function uses radians instead of degrees. So I needed to convert my degrees into radians. I also wanted these arrows to be pointing in the direction the wind is flowing, so I had to do some additional fudging. After all that, I have the plot below:\nAll in all, I enjoy this figure and like how this plot allows me to see the passage of the storm relative to the weather station. I’m still on the hunt for good data visualizations of wind, but for now, this was pretty nice!"
+  },
+  {
+    "objectID": "posts/what-about-wind/index.html#last-updated",
+    "href": "posts/what-about-wind/index.html#last-updated",
+    "title": "What to do with wind?",
+    "section": "Last updated",
+    "text": "Last updated\n\n2023-03-21 16:26:37 EDT"
+  },
+  {
+    "objectID": "posts/what-about-wind/index.html#details",
+    "href": "posts/what-about-wind/index.html#details",
+    "title": "What to do with wind?",
+    "section": "Details",
+    "text": "Details\n\nsource code, R environment"
+  }
+]

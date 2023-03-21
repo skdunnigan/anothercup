@@ -1,13 +1,10 @@
 ---
 title: "What to do with wind?"
-author:
-  - name: Shannon Dunnigan
-    url: https://djnavarro.net
-    affiliation: GTMNERR
-    affiliation-url: https://gtmnerr.org
-date: "2022-08-25"
+# author:
+#   - name: Shannon Dunnigan
+date: "2023-03-21"
 categories: [swmp, code, analysis]
-image: "image.jpg"
+image: "hurricane-from-space.jpg"
 # citation:
 #   url: ""
 ---
@@ -17,12 +14,17 @@ image: "image.jpg"
 ```{r}
 #| label: setup
 #| include: false
+#| message: false
+#| warning: false
+ 
+library(here)
+library(tidyverse)
 
-
-long_slug <- "2022-08-25_post-with-code"
+long_slug <- "2023-03-21_what-about-wind"
 #renv::use(lockfile = "renv.lock")
 
 # load data
+load(here('posts', 'what-about-wind', 'MET.RData'))
 
 ```
 
@@ -32,7 +34,14 @@ I work with water quality and meteorological data regularly with my work. As suc
 
 This came about in my work summarizing the effects of recent hurricanes Ian (October 2022) and Nicole (November 2022) in northeast Florida. The typical way folks in my office have depicted wind data has been through the use of wind roses. Don't get me wrong, wind roses have their usefulness! However, when it came to the matter of these hurricanes, I was also interested in a *time* element to the data that is just not captured well in a wind rose.
 
-\[INSERT WIND ROSE EXAMPLE HERE\]
+Here's an example of a wind rose from the `openair` package.
+
+```{r}
+library(openair)
+
+windRose(mydata)
+
+```
 
 For this, I wanted to to see if there was a way to visualize the predominating wind directions and speeds in the days preceding, during, and following the hurricanes. So, I went down a Google rabbit hole attempting to examples of how others have attempted something like this in the past. I wanted something that:
 
@@ -44,48 +53,56 @@ For this, I wanted to to see if there was a way to visualize the predominating w
 
 I ended up stumbling upon a [great thread on Stack Overflow](https://stackoverflow.com/questions/47880918/how-to-plot-wind-direction-with-lat-lon-and-arrow-in-ggplot2) that used a raster grid-style plot where every cell had a latitude and longitude component as well as the wind speed and direction. Since I was visualizing wind data generated from a [single, fixed station]()
 
-Here is the data we are working with: aggregated 15-minute wind speed (m/s) and direction data averaged to the hour.
+Here is the data we are working with: aggregated 15-minute wind speed (m/s) and direction data averaged to the hour. 
 
 ```{r}
 #| label: data
+
 head(MET)
 
 ```
 
-date, hour, mph conversions
-- run code
-
-create plot
-- doesn't look right
-
-oh shoot, the angles are in radians
-- convert degrees to radians
-
-Still doesn't look right, I want direction to show move towards
-- convert again.
-
-Make it pretty
-
-
-
-Fudging our code
+Using the `dplyr::mutate()` function, I then pulled out the day and hour information from the `datetimestamp` variable and also converted wind speed into miles per hour (this is what is reported in the news).
 
 ```{r}
-# create new df for just wspd and direction data with conversions to SI units
-MET_wind <- MET %>% 
-  filter(between(datetimestamp, 
-                 as.POSIXct("2022-09-27 00:00:00"), 
-                 as.POSIXct("2022-10-02 00:00:00"))) %>%
-  aggreswmp(by = "hours", params = c('wspd', 'maxwspd', 'wdir')) %>% 
-  mutate(day = lubridate::date(datetimestamp),
-         hour = lubridate::hour(datetimestamp),
-         wspd_mph = wspd * 2.23694,
-         maxwspd_mph = maxwspd * 2.23694,
-         wdir_x = ((wdir +180) * 0.0174533)) # angles are in radians not degrees, need to convert for plotting
+MET_dat <- MET %>% 
+            dplyr::mutate(day = lubridate::date(datetimestamp),
+                          hour = lubridate::hour(datetimestamp),
+                          wspd_mph = wspd * 2.23694)
 
+head(MET_dat)
+```
 
-MET_wind %>% 
+I used that thread on Stack Overflow to create a similar plot with a color scheme I preferred. Instead of latitude and longitude, I plotted by hour and day. I also used `scale_x_continuous` to break the x-axis so it is easier to read the hours in the day.
+
+```{r}
+MET_dat %>% 
   filter(day > as.Date("2022-09-26")) %>% 
+  ggplot(aes(x = hour, 
+             y = day, 
+             fill = wspd_mph, 
+             angle = wdir, 
+             radius = scales::rescale(wspd_mph, c(.3, .8)))) +
+    geom_raster() +
+    geom_spoke(arrow = arrow(length = unit(.05, 'inches'))) + 
+    scale_fill_distiller(palette = "RdYlBu") + 
+    coord_equal(expand = 0) +
+    scale_x_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20,22)) +
+    theme_classic() +
+  theme(axis.text = element_text(color = "black", size = 12),
+        legend.position = 'top', 
+        legend.direction = 'horizontal') +
+  labs(x = "Hour of Day (24hr)",
+       y = "",
+       fill = "Wind Speed (mph)")
+```
+
+I noticed something weird with the direction data, however, and after some reading into the code I realized that the `geom_spoke` function uses radians instead of degrees. So I needed to convert my degrees into radians. I also wanted these arrows to be pointing in the direction the wind is flowing, so I had to do some additional fudging. After all that, I have the plot below:
+
+```{r}
+MET_dat %>% 
+  filter(day > as.Date("2022-09-26")) %>% 
+  mutate(wdir_x = (wdir +180) * 0.0174533) %>% # convert to radians
   ggplot(aes(x = hour, 
              y = day, 
              fill = wspd_mph, 
@@ -105,27 +122,14 @@ MET_wind %>%
        fill = "Wind Speed (mph)")
 ```
 
-This is a post with executable code.
-
-```{r}
-# label: code
-
-1 + 1
-
-a <- 2 + 3 
-
-# 1 >= 2
-# 1 != 2
-
-
-```
+All in all, I enjoy this figure and like how this plot allows me to see the passage of the storm relative to the weather station. I'm still on the hunt for good data visualizations of wind, but for now, this was pretty nice!
 
 <!--------------- my footer ----------------->
 
 ```{r, echo=FALSE}
 source("appendix.R")
 insert_appendix(
-  repo_spec = "skdunnigan/another-cup-of-tea", 
+  repo_spec = "skdunnigan/anothercup", 
   name = long_slug
 )
 ```

@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss  xmlns:atom="http://www.w3.org/2005/Atom" 
+      xmlns:media="http://search.yahoo.com/mrss/" 
+      xmlns:content="http://purl.org/rss/1.0/modules/content/" 
+      xmlns:dc="http://purl.org/dc/elements/1.1/" 
+      version="2.0">
+<channel>
+<title>Another Cup</title>
+<link>https://github.com/skdunnigan/index.html</link>
+<atom:link href="https://github.com/skdunnigan/index.xml" rel="self" type="application/rss+xml"/>
+<description></description>
+<generator>quarto-1.0.38</generator>
+<lastBuildDate>Tue, 21 Mar 2023 04:00:00 GMT</lastBuildDate>
+<item>
+  <title>What to do with wind?</title>
+  <link>https://github.com/skdunnigan/posts/what-about-wind/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<!--------------- my typical setup ----------------->
+<!--------------- my post ----------------->
+<p>I work with water quality and meteorological data regularly with my work. As such, I am often trying to find creative ways to summarize and visualize this data to share with resource managers, educators, and colleagues. One of the recent challenges has been on how to present wind speed and direction data in an easy-to-digest format to other people.</p>
+<p>This came about in my work summarizing the effects of recent hurricanes Ian (October 2022) and Nicole (November 2022) in northeast Florida. The typical way folks in my office have depicted wind data has been through the use of wind roses. Don’t get me wrong, wind roses have their usefulness! However, when it came to the matter of these hurricanes, I was also interested in a <em>time</em> element to the data that is just not captured well in a wind rose.</p>
+<p>Here’s an example of a wind rose from the <code>openair</code> package.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;">library</span>(openair)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;">windRose</span>(mydata)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://github.com/skdunnigan/posts/what-about-wind/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>For this, I wanted to to see if there was a way to visualize the predominating wind directions and speeds in the days preceding, during, and following the hurricanes. So, I went down a Google rabbit hole attempting to examples of how others have attempted something like this in the past. I wanted something that:</p>
+<ul>
+<li><p>was captured in a 2-D static image</p></li>
+<li><p>showed direction and speed at specific time intervals</p></li>
+<li><p>was easy to understand</p></li>
+</ul>
+<p>I ended up stumbling upon a <a href="https://stackoverflow.com/questions/47880918/how-to-plot-wind-direction-with-lat-lon-and-arrow-in-ggplot2">great thread on Stack Overflow</a> that used a raster grid-style plot where every cell had a latitude and longitude component as well as the wind speed and direction. Since I was visualizing wind data generated from a <a href="">single, fixed station</a></p>
+<p>Here is the data we are working with: aggregated 15-minute wind speed (m/s) and direction data averaged to the hour.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;">head</span>(MET)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        datetimestamp  wspd   wdir
+1 2022-09-26 23:00:00 0.050 236.00
+2 2022-09-27 00:00:00 0.050  97.75
+3 2022-09-27 01:00:00 0.675 211.75
+4 2022-09-27 02:00:00 0.725 233.25
+5 2022-09-27 03:00:00 0.925 260.25
+6 2022-09-27 04:00:00 1.250 286.75</code></pre>
+</div>
+</div>
+<p>Using the <code>dplyr::mutate()</code> function, I then pulled out the day and hour information from the <code>datetimestamp</code> variable and also converted wind speed into miles per hour (this is what is reported in the news).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">MET_dat <span class="ot" style="color: #003B4F;">&lt;-</span> MET <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb4-2">            dplyr<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">day =</span> lubridate<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">date</span>(datetimestamp),</span>
+<span id="cb4-3">                          <span class="at" style="color: #657422;">hour =</span> lubridate<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">hour</span>(datetimestamp),</span>
+<span id="cb4-4">                          <span class="at" style="color: #657422;">wspd_mph =</span> wspd <span class="sc" style="color: #5E5E5E;">*</span> <span class="fl" style="color: #AD0000;">2.23694</span>)</span>
+<span id="cb4-5"></span>
+<span id="cb4-6"><span class="fu" style="color: #4758AB;">head</span>(MET_dat)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        datetimestamp  wspd   wdir        day hour wspd_mph
+1 2022-09-26 23:00:00 0.050 236.00 2022-09-26   23 0.111847
+2 2022-09-27 00:00:00 0.050  97.75 2022-09-27    0 0.111847
+3 2022-09-27 01:00:00 0.675 211.75 2022-09-27    1 1.509935
+4 2022-09-27 02:00:00 0.725 233.25 2022-09-27    2 1.621781
+5 2022-09-27 03:00:00 0.925 260.25 2022-09-27    3 2.069170
+6 2022-09-27 04:00:00 1.250 286.75 2022-09-27    4 2.796175</code></pre>
+</div>
+</div>
+<p>I used that thread on Stack Overflow to create a similar plot with a color scheme I preferred. Instead of latitude and longitude, I plotted by hour and day. I also used <code>scale_x_continuous</code> to break the x-axis so it is easier to read the hours in the day.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">MET_dat <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;">filter</span>(day <span class="sc" style="color: #5E5E5E;">&gt;</span> <span class="fu" style="color: #4758AB;">as.Date</span>(<span class="st" style="color: #20794D;">"2022-09-26"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">x =</span> hour, </span>
+<span id="cb6-4">             <span class="at" style="color: #657422;">y =</span> day, </span>
+<span id="cb6-5">             <span class="at" style="color: #657422;">fill =</span> wspd_mph, </span>
+<span id="cb6-6">             <span class="at" style="color: #657422;">angle =</span> wdir, </span>
+<span id="cb6-7">             <span class="at" style="color: #657422;">radius =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">rescale</span>(wspd_mph, <span class="fu" style="color: #4758AB;">c</span>(.<span class="dv" style="color: #AD0000;">3</span>, .<span class="dv" style="color: #AD0000;">8</span>)))) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-8">    <span class="fu" style="color: #4758AB;">geom_raster</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-9">    <span class="fu" style="color: #4758AB;">geom_spoke</span>(<span class="at" style="color: #657422;">arrow =</span> <span class="fu" style="color: #4758AB;">arrow</span>(<span class="at" style="color: #657422;">length =</span> <span class="fu" style="color: #4758AB;">unit</span>(.<span class="dv" style="color: #AD0000;">05</span>, <span class="st" style="color: #20794D;">'inches'</span>))) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb6-10">    <span class="fu" style="color: #4758AB;">scale_fill_distiller</span>(<span class="at" style="color: #657422;">palette =</span> <span class="st" style="color: #20794D;">"RdYlBu"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb6-11">    <span class="fu" style="color: #4758AB;">coord_equal</span>(<span class="at" style="color: #657422;">expand =</span> <span class="dv" style="color: #AD0000;">0</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-12">    <span class="fu" style="color: #4758AB;">scale_x_continuous</span>(<span class="at" style="color: #657422;">breaks =</span> <span class="fu" style="color: #4758AB;">c</span>(<span class="dv" style="color: #AD0000;">0</span>,<span class="dv" style="color: #AD0000;">2</span>,<span class="dv" style="color: #AD0000;">4</span>,<span class="dv" style="color: #AD0000;">6</span>,<span class="dv" style="color: #AD0000;">8</span>,<span class="dv" style="color: #AD0000;">10</span>,<span class="dv" style="color: #AD0000;">12</span>,<span class="dv" style="color: #AD0000;">14</span>,<span class="dv" style="color: #AD0000;">16</span>,<span class="dv" style="color: #AD0000;">18</span>,<span class="dv" style="color: #AD0000;">20</span>,<span class="dv" style="color: #AD0000;">22</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-13">    <span class="fu" style="color: #4758AB;">theme_classic</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-14">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">axis.text =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"black"</span>, <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">12</span>),</span>
+<span id="cb6-15">        <span class="at" style="color: #657422;">legend.position =</span> <span class="st" style="color: #20794D;">'top'</span>, </span>
+<span id="cb6-16">        <span class="at" style="color: #657422;">legend.direction =</span> <span class="st" style="color: #20794D;">'horizontal'</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb6-17">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Hour of Day (24hr)"</span>,</span>
+<span id="cb6-18">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">""</span>,</span>
+<span id="cb6-19">       <span class="at" style="color: #657422;">fill =</span> <span class="st" style="color: #20794D;">"Wind Speed (mph)"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://github.com/skdunnigan/posts/what-about-wind/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I noticed something weird with the direction data, however, and after some reading into the code I realized that the <code>geom_spoke</code> function uses radians instead of degrees. So I needed to convert my degrees into radians. I also wanted these arrows to be pointing in the direction the wind is flowing, so I had to do some additional fudging. After all that, I have the plot below:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">MET_dat <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;">filter</span>(day <span class="sc" style="color: #5E5E5E;">&gt;</span> <span class="fu" style="color: #4758AB;">as.Date</span>(<span class="st" style="color: #20794D;">"2022-09-26"</span>)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-3">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">wdir_x =</span> (wdir <span class="sc" style="color: #5E5E5E;">+</span><span class="dv" style="color: #AD0000;">180</span>) <span class="sc" style="color: #5E5E5E;">*</span> <span class="fl" style="color: #AD0000;">0.0174533</span>) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> <span class="co" style="color: #5E5E5E;"># convert to radians</span></span>
+<span id="cb7-4">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">x =</span> hour, </span>
+<span id="cb7-5">             <span class="at" style="color: #657422;">y =</span> day, </span>
+<span id="cb7-6">             <span class="at" style="color: #657422;">fill =</span> wspd_mph, </span>
+<span id="cb7-7">             <span class="at" style="color: #657422;">angle =</span> wdir_x, </span>
+<span id="cb7-8">             <span class="at" style="color: #657422;">radius =</span> scales<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">rescale</span>(wspd_mph, <span class="fu" style="color: #4758AB;">c</span>(.<span class="dv" style="color: #AD0000;">3</span>, .<span class="dv" style="color: #AD0000;">8</span>)))) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-9">    <span class="fu" style="color: #4758AB;">geom_raster</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-10">    <span class="fu" style="color: #4758AB;">geom_spoke</span>(<span class="at" style="color: #657422;">arrow =</span> <span class="fu" style="color: #4758AB;">arrow</span>(<span class="at" style="color: #657422;">length =</span> <span class="fu" style="color: #4758AB;">unit</span>(.<span class="dv" style="color: #AD0000;">05</span>, <span class="st" style="color: #20794D;">'inches'</span>))) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb7-11">    <span class="fu" style="color: #4758AB;">scale_fill_distiller</span>(<span class="at" style="color: #657422;">palette =</span> <span class="st" style="color: #20794D;">"RdYlBu"</span>) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb7-12">    <span class="fu" style="color: #4758AB;">coord_equal</span>(<span class="at" style="color: #657422;">expand =</span> <span class="dv" style="color: #AD0000;">0</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-13">    <span class="fu" style="color: #4758AB;">scale_x_continuous</span>(<span class="at" style="color: #657422;">breaks =</span> <span class="fu" style="color: #4758AB;">c</span>(<span class="dv" style="color: #AD0000;">0</span>,<span class="dv" style="color: #AD0000;">2</span>,<span class="dv" style="color: #AD0000;">4</span>,<span class="dv" style="color: #AD0000;">6</span>,<span class="dv" style="color: #AD0000;">8</span>,<span class="dv" style="color: #AD0000;">10</span>,<span class="dv" style="color: #AD0000;">12</span>,<span class="dv" style="color: #AD0000;">14</span>,<span class="dv" style="color: #AD0000;">16</span>,<span class="dv" style="color: #AD0000;">18</span>,<span class="dv" style="color: #AD0000;">20</span>,<span class="dv" style="color: #AD0000;">22</span>)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-14">    <span class="fu" style="color: #4758AB;">theme_classic</span>() <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-15">  <span class="fu" style="color: #4758AB;">theme</span>(<span class="at" style="color: #657422;">axis.text =</span> <span class="fu" style="color: #4758AB;">element_text</span>(<span class="at" style="color: #657422;">color =</span> <span class="st" style="color: #20794D;">"black"</span>, <span class="at" style="color: #657422;">size =</span> <span class="dv" style="color: #AD0000;">12</span>),</span>
+<span id="cb7-16">        <span class="at" style="color: #657422;">legend.position =</span> <span class="st" style="color: #20794D;">'top'</span>, </span>
+<span id="cb7-17">        <span class="at" style="color: #657422;">legend.direction =</span> <span class="st" style="color: #20794D;">'horizontal'</span>) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-18">  <span class="fu" style="color: #4758AB;">labs</span>(<span class="at" style="color: #657422;">x =</span> <span class="st" style="color: #20794D;">"Hour of Day (24hr)"</span>,</span>
+<span id="cb7-19">       <span class="at" style="color: #657422;">y =</span> <span class="st" style="color: #20794D;">""</span>,</span>
+<span id="cb7-20">       <span class="at" style="color: #657422;">fill =</span> <span class="st" style="color: #20794D;">"Wind Speed (mph)"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://github.com/skdunnigan/posts/what-about-wind/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>All in all, I enjoy this figure and like how this plot allows me to see the passage of the storm relative to the weather station. I’m still on the hunt for good data visualizations of wind, but for now, this was pretty nice!</p>
+<!--------------- my footer ----------------->
+<div class="cell">
+<div class="cell-output-display">
+
+
+</div>
+</div>
+
+
+
+<div id="quarto-appendix" class="default"><section id="last-updated" class="level2 appendix"><h2 class="quarto-appendix-heading">Last updated</h2><div class="quarto-appendix-contents">
+
+<p>2023-03-21 16:26:37 EDT</p>
+</div></section><section id="details" class="level2 appendix"><h2 class="quarto-appendix-heading">Details</h2><div class="quarto-appendix-contents">
+
+<p><a href="https://github.com/skdunnigan/anothercup/tree/main/posts/2022-08-25_post-with-code/index.qmd">source code</a>, <a href="https://github.com/skdunnigan/anothercup/tree/main/posts/2022-08-25_post-with-code/renv.lock">R environment</a></p>
+</div></section></div> ]]></description>
+  <category>swmp</category>
+  <category>code</category>
+  <category>analysis</category>
+  <guid>https://github.com/skdunnigan/posts/what-about-wind/index.html</guid>
+  <pubDate>Tue, 21 Mar 2023 04:00:00 GMT</pubDate>
+  <media:content url="https://github.com/skdunnigan/posts/what-about-wind/hurricane-from-space.jpg" medium="image" type="image/jpeg"/>
+</item>
+<item>
+  <title>Welcome To My Blog</title>
+  <link>https://github.com/skdunnigan/posts/welcome/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<!--------------- my typical setup ----------------->
+<!--------------- my post ----------------->
+<p><img src="https://github.com/skdunnigan/posts/welcome/another-image.png" class="img-fluid"></p>
+<p>This is my first post in a Quarto blog! That being said, this is also my first attempt <em>at</em> a Quarto blog. Welcome!</p>
+<p>I have written blogs before though nothing like this and especially not one with an emphasis on coding. It is very difficult to get a lot of my friends and family interested in the work that I do with R. Therefore, this blog is for me. It’s for me to be able to “talk out” what I find and how I’m learning. It’s a way to discover new things or attempt data science challenges - I’ve always wanted to participate in some of the <a href="https://github.com/rfordatascience/tidytuesday">TidyTuesday</a> challenges!</p>
+<p><strong><em>Have you ever figured out a solution to a problem that then presented itself again several weeks/months/years down the line and you forgot what your original fix was?</em></strong><sup>1</sup></p>
+<p>Yeah…I’ve been there a lot. That being said, I am also hoping this blog will be a great place to store all of these workflows for me (or anyone) to reference again in the future.</p>
+<section id="why-another-cup" class="level1">
+<h1>Why “Another Cup”?</h1>
+<p>Why did I call this blog “Another Cup”? Well, because some problems simply require another cup of a hot (or cold!) beverage to solve!<sup>2</sup></p>
+<p>So, here is to tackling new things with another cup of [whatever] in hand!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Okay, if you answered “no” then you must be some sort of magician.↩︎</p></li>
+<li id="fn2"><p>I’m partial to coffee, myself. Today was a cup of Starbucks Instant Coffee (don’t judge!)↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>news</category>
+  <guid>https://github.com/skdunnigan/posts/welcome/index.html</guid>
+  <pubDate>Thu, 16 Mar 2023 04:00:00 GMT</pubDate>
+  <media:content url="https://github.com/skdunnigan/posts/welcome/another-image.png" medium="image" type="image/png" height="72" width="144"/>
+</item>
+</channel>
+</rss>
