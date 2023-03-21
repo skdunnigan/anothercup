@@ -1,0 +1,12 @@
+/*-- scss:defaults --*/
+
+// use solar as the base
+$theme: "solar" !default;
+
+
+// import google fonts
+@import url('https://fonts.googleapis.com/css2?family=Fira+Code');
+
+// set Fira Code as code font
+$font-family-monospace: 'Fira Code';
+

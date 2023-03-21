@@ -1,0 +1,36 @@
+---
+title: "Welcome To My Blog"
+description: |
+  This blog is a way to capture the different things I am learning or working on with R code.
+date: "2023-03-16"
+categories: [news]
+---
+
+<!--------------- my typical setup ----------------->
+
+```{r setup, include=FALSE}
+long_slug <- "2023-03-21_welcome"
+#renv::use(lockfile = "renv.lock")
+```
+
+<!--------------- my post ----------------->
+
+This is my first post in a Quarto blog! That being said, this is also my first attempt *at* a Quarto blog. Welcome! 
+
+![](thumbnail.jpg)
+
+I have written blogs before though nothing like this and especially not one with an emphasis on coding. It is very difficult to get a lot of my friends and family interested in the work that I do with R. Therefore, this blog is for me. It's for me to be able to "talk out" what I find and how I'm learning. It's a way to discover new things or attempt data science challenges - I've always wanted to participate in some of the [TidyTuesday](https://github.com/rfordatascience/tidytuesday) challenges! 
+
+***Have you ever figured out a solution to a problem that then presented itself again several weeks/months/years down the line and you forgot what your original fix was?***[^1]
+
+[^1]: Okay, if you answered "no" then you must be some sort of magician.
+
+Yeah...I've been there a lot. That being said, I am also hoping this blog will be a great place to store all of these workflows for me (or anyone) to reference again in the future.
+
+# Why "Another Cup"?
+
+Why did I call this blog "Another Cup"? Well, because some problems simply require another cup of a hot (or cold!) beverage to solve![^2]
+
+[^2]: I'm partial to coffee, myself. Today was a cup of Starbucks Instant Coffee (don't judge!)
+
+So, here is to tackling new things with another cup of [whatever] in hand!

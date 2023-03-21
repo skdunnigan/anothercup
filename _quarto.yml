@@ -1,0 +1,25 @@
+project:
+  type: website
+
+website:
+  title: "Another Cup"
+  site-url: https://github.com/skdunnigan
+  repo-url: https://github.com/skdunnigan
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        aria-label: github
+        href: https://github.com/skdunnigan
+      # - icon: twitter
+      #   href: https://twitter.com
+  references: references.bib    
+  
+format:
+  html:
+    theme: 
+      - solar
+      - my-solar.scss
+
+
+

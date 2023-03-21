@@ -1,0 +1,131 @@
+---
+title: "What to do with wind?"
+author:
+  - name: Shannon Dunnigan
+    url: https://djnavarro.net
+    affiliation: GTMNERR
+    affiliation-url: https://gtmnerr.org
+date: "2022-08-25"
+categories: [swmp, code, analysis]
+image: "image.jpg"
+# citation:
+#   url: ""
+---
+
+<!--------------- my typical setup ----------------->
+
+```{r}
+#| label: setup
+#| include: false
+
+
+long_slug <- "2022-08-25_post-with-code"
+#renv::use(lockfile = "renv.lock")
+
+# load data
+
+```
+
+<!--------------- my post ----------------->
+
+I work with water quality and meteorological data regularly with my work. As such, I am often trying to find creative ways to summarize and visualize this data to share with resource managers, educators, and colleagues. One of the recent challenges has been on how to present wind speed and direction data in an easy-to-digest format to other people.
+
+This came about in my work summarizing the effects of recent hurricanes Ian (October 2022) and Nicole (November 2022) in northeast Florida. The typical way folks in my office have depicted wind data has been through the use of wind roses. Don't get me wrong, wind roses have their usefulness! However, when it came to the matter of these hurricanes, I was also interested in a *time* element to the data that is just not captured well in a wind rose.
+
+\[INSERT WIND ROSE EXAMPLE HERE\]
+
+For this, I wanted to to see if there was a way to visualize the predominating wind directions and speeds in the days preceding, during, and following the hurricanes. So, I went down a Google rabbit hole attempting to examples of how others have attempted something like this in the past. I wanted something that:
+
+-   was captured in a 2-D static image
+
+-   showed direction and speed at specific time intervals
+
+-   was easy to understand
+
+I ended up stumbling upon a [great thread on Stack Overflow](https://stackoverflow.com/questions/47880918/how-to-plot-wind-direction-with-lat-lon-and-arrow-in-ggplot2) that used a raster grid-style plot where every cell had a latitude and longitude component as well as the wind speed and direction. Since I was visualizing wind data generated from a [single, fixed station]()
+
+Here is the data we are working with: aggregated 15-minute wind speed (m/s) and direction data averaged to the hour.
+
+```{r}
+#| label: data
+head(MET)
+
+```
+
+date, hour, mph conversions
+- run code
+
+create plot
+- doesn't look right
+
+oh shoot, the angles are in radians
+- convert degrees to radians
+
+Still doesn't look right, I want direction to show move towards
+- convert again.
+
+Make it pretty
+
+
+
+Fudging our code
+
+```{r}
+# create new df for just wspd and direction data with conversions to SI units
+MET_wind <- MET %>% 
+  filter(between(datetimestamp, 
+                 as.POSIXct("2022-09-27 00:00:00"), 
+                 as.POSIXct("2022-10-02 00:00:00"))) %>%
+  aggreswmp(by = "hours", params = c('wspd', 'maxwspd', 'wdir')) %>% 
+  mutate(day = lubridate::date(datetimestamp),
+         hour = lubridate::hour(datetimestamp),
+         wspd_mph = wspd * 2.23694,
+         maxwspd_mph = maxwspd * 2.23694,
+         wdir_x = ((wdir +180) * 0.0174533)) # angles are in radians not degrees, need to convert for plotting
+
+
+MET_wind %>% 
+  filter(day > as.Date("2022-09-26")) %>% 
+  ggplot(aes(x = hour, 
+             y = day, 
+             fill = wspd_mph, 
+             angle = wdir_x, 
+             radius = scales::rescale(wspd_mph, c(.3, .8)))) +
+    geom_raster() +
+    geom_spoke(arrow = arrow(length = unit(.05, 'inches'))) + 
+    scale_fill_distiller(palette = "RdYlBu") + 
+    coord_equal(expand = 0) +
+    scale_x_continuous(breaks = c(0,2,4,6,8,10,12,14,16,18,20,22)) +
+    theme_classic() +
+  theme(axis.text = element_text(color = "black", size = 12),
+        legend.position = 'top', 
+        legend.direction = 'horizontal') +
+  labs(x = "Hour of Day (24hr)",
+       y = "",
+       fill = "Wind Speed (mph)")
+```
+
+This is a post with executable code.
+
+```{r}
+# label: code
+
+1 + 1
+
+a <- 2 + 3 
+
+# 1 >= 2
+# 1 != 2
+
+
+```
+
+<!--------------- my footer ----------------->
+
+```{r, echo=FALSE}
+source("appendix.R")
+insert_appendix(
+  repo_spec = "skdunnigan/another-cup-of-tea", 
+  name = long_slug
+)
+```
