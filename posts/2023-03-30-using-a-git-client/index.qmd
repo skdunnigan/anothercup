@@ -1,0 +1,15 @@
+---
+title: "Using a Git client"
+description: |
+  making the move to a Git client
+date: 2023-03-30
+bibliography: references.bib
+---
+
+I have been using [Git](https://git-scm.com/) and [GitHub](https://github.com) for the past five years or so, however it has only been in the past two years that I feel like I have truly developed any type of workflow or process for using it. It all started in my attempts to understand what GitHub was and how I could 1) access information that was on it, 2) become part of that community, and 3) use it in my own work. I had stumbled upon Jenny Bryan's online book "[Happy Git and GitHub for the useR](https://happygitwithr.com/){#happygitwithr}" back when I first downloaded Git onto my computer and a lot of what I know and understand about working with Git comes from that resource. I always recommend it to anyone interested in working in a version control system with their code, especially for collaboration.
+
+She has even written a great article on why a data analyst/scientist would want to use version control [@bryan2017], the biggest reason of which is to keep track of all your stuff! With a lot of these R projects comes
+
+Not to repeat a lot of what is out there already like , but just for clarification: Git and GitHub, like R and RStudio, are not the same thing.
+
+At that time, I was trying to figure out a way to use GitHub
